@@ -1,1 +1,4 @@
-__all__ = ["SimplePreprocessor"]
+__all__ = ['SimplePreprocessor']
+
+
+from pyimagesearch.preprocessing.simplepreprocessor import *

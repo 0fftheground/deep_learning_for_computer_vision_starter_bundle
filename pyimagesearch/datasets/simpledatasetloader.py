@@ -28,7 +28,7 @@ class SimpleDatasetLoader:
             # check to see if our preprocessors are not None
             if self.preprocessors is not None:
                 for p in self.preprocessors:
-                    image = p.prepreocess(image)
+                    image = p.preprocess(image)
 
             # treat our processed image as a "feature vector"
             # by updating the data list followed by the labels

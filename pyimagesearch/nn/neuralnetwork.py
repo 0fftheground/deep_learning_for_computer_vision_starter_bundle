@@ -24,16 +24,25 @@ class NeuralNetwork:
     def sigmoid_deriv(self, x):
         return x * (1 - x)
 
-    def fit_partial(self,x,y):
+    def fit_partial(self, x, y):
         # feedforward
         A = [np.atleast_2d(x)]
-        for layer in np.arange(0,len(self.W)):
+        for layer in np.arange(0, len(self.W)):
             net = A[layer].dot(self.W[layer])
             out = self.sigmoid(net)
             A.append(out)
         # backpropagation
-        error = A[-1] -y
-        D = [error*self.sigmoid_deriv(A[-1])]
+        error = A[-1] - y
+        D = [error * self.sigmoid_deriv(A[-1])]
+        for layer in np.arange(len(A) - 2, 0, -1):
+            delta = D[-1].dot(self.W[layer].T)
+            delta = delta * self.sigmoid_deriv(A[layer])
+            D.append(delta)
+        D = D[::-1]
+
+        # WEIGHT UPDATE PHASE
+        for layer in np.arange(0, len(self.W)):
+            self.W[layer] += -self.alpha * A[layer].T.dot(D[layer])
 
     def fit(self, X, y, epochs=1000, displayUpdate=100):
         X = np.c_[X, np.ones(X.shape[0])]
@@ -47,3 +56,19 @@ class NeuralNetwork:
                 print("[INFO] epoch={}, loss = {:.7f}".format(
                     epoch + 1, loss
                 ))
+
+    def predict(self, X, addBias=True):
+        p = np.atleast_2d(X)
+        if addBias:
+            p = np.c_[p, np.ones(p.shape[0])]
+
+        for layer in np.arange(0, len(self.W)):
+            p = self.sigmoid(np.dot(p, self.W[layer]))
+
+        return p
+
+    def calculate_loss(self, X, targets):
+        targets = np.atleast_2d(targets)
+        prediction = self.predict(X, addBias=False)
+        loss = 0.5 * np.sum((prediction - targets) ** 2)
+        return loss
